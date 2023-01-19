@@ -21,13 +21,23 @@
                                 <rect key="frame" x="0.0" y="59" width="393" height="759"/>
                                 <standardMapConfiguration key="preferredConfiguration"/>
                             </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Fs-Ao-u5T">
+                                <rect key="frame" x="294" y="759" width="75" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Button"/>
+                                <connections>
+                                    <action selector="drawRouteWithSender:" destination="BYZ-38-t0r" eventType="touchUpInside" id="izL-xc-Xnf"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="9Fs-Ao-u5T" secondAttribute="bottom" constant="24" id="0wQ-zp-QLJ"/>
                             <constraint firstItem="5Tz-Yz-aSX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="77O-J5-evJ"/>
                             <constraint firstItem="5Tz-Yz-aSX" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="LBv-n4-PDR"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="5Tz-Yz-aSX" secondAttribute="trailing" id="cLR-0S-WoW"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="9Fs-Ao-u5T" secondAttribute="trailing" constant="24" id="eIb-zt-I6G"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="5Tz-Yz-aSX" secondAttribute="bottom" id="hW5-5S-2vF"/>
                         </constraints>
                     </view>

@@ -46,6 +46,43 @@ class ViewController: UIViewController {
         map.delegate = self
                         
     }
+    
+    @IBAction func drawRoute(sender: UIButton) {
+        map.removeOverlays(map.overlays)
+        
+        var nextIndex = 0
+        for index in 0 ... 2{
+            if index == 2 {
+                nextIndex = 0
+            } else {
+                nextIndex = index + 1
+            }
+            
+            let source = MKPlacemark(coordinate: map.annotations[index].coordinate)
+            let destination = MKPlacemark(coordinate: map.annotations[nextIndex].coordinate)
+            
+            let directionRequest = MKDirections.Request()
+            
+            directionRequest.source = MKMapItem(placemark: source)
+            directionRequest.destination = MKMapItem(placemark: destination)
+            
+            directionRequest.transportType = .automobile
+            
+            let directions = MKDirections(request: directionRequest)
+            directions.calculate(completionHandler: { (response, error) in
+                guard let directionResponse = response else {
+                    return
+                }
+                
+                let route = directionResponse.routes[0]
+                self.map.addOverlay(route.polyline, level: .aboveRoads)
+                
+                let rect = route.polyline.boundingMapRect
+                self.map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
+            })
+        }
+        
+    }
 
     //MARK: show updating location
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -79,25 +116,71 @@ class ViewController: UIViewController {
         //let locations = map.annotations.map( { $0.coordinate; $0.title})
         var myAnnotations: [CLLocationCoordinate2D] = [CLLocationCoordinate2D]()
         for (index, anno) in map.annotations.enumerated() {
+            /*
             if anno.title == "My Location" {
                 continue
             }
+            */
             myAnnotations.append(anno.coordinate)
         }
         myAnnotations.append(myAnnotations[0])
-        let polyline = MKPolyline(coordinates: myAnnotations, count: myAnnotations.count)
         
-        /*
-        for index in 0 ..< places.count - 1 {
-            let distance: Double = getDistance(from: places[index].coordinate, to: places[index + 1].coordinate)
+        let polyline = MKPolyline(coordinates: myAnnotations, count: myAnnotations.count)
+        polyline.title = "DONE"
+        map.addOverlay(polyline, level: .aboveRoads)
+        
+        
+        var nextIndex = 0
+        for index in 0 ... 2{
+            if index == 2 {
+                nextIndex = 0
+            } else {
+                nextIndex = index + 1
+            }
+            print(map.annotations.count)
             
-            print("\(Double( round(distance * 0.001))) Km")
-            polyline.title = "\(distance) Km"
+            
+            
+            let distance: Double = getDistance(from: map.annotations[index].coordinate, to:  map.annotations[nextIndex].coordinate)
+            
+            //print("\(Double( round(distance * 0.001))) Km")
+            //polyline.title = "\(distance) Km"
+            
+            let distanceAnnotation = MKPointAnnotation()
+            
+
+            //let midPointLat = (map.annotations[index].coordinate.latitude - map.annotations[nextIndex].coordinate.latitude) / 2
+            //let midPointLong = (map.annotations[index].coordinate.longitude - map.annotations[nextIndex].coordinate.longitude) / 2
+      
+        
+            //distanceAnnotation.coordinate = CLLocationCoordinate2DMake(midPointLat, midPointLong)
+            //var place = Place(coordinate: distanceAnnotation.coordinate)
+            //place.title = "\(Double( round(distance * 0.001))) Km"
+            //map.addAnnotation(place)
+            
+            distanceMarket(distance: distance, polyline: polyline)
+            
         }
-        */
-        map.addOverlay(polyline)
-     
+        
+      
     }
+    
+    private func distanceMarket(distance: Double, polyline: MKPolyline) {
+        
+        let pin = MKPointAnnotation()
+        pin.title = "distance"
+        
+        let point: CGPoint = map.convert(polyline.coordinate, toPointTo: map)
+        
+        pin.coordinate = map.convert(point, toCoordinateFrom: map)
+        
+        //var place = Place(coordinate: polyline.coordinate)
+        //place.title = "\(Double( round(distance * 0.001))) Km)"
+        //map.addAnnotation(pin)
+        print(pin.coordinate)
+        print("\(round(distance)) ms")
+    }
+    
     
     @objc func removeAnnotation(point: UITapGestureRecognizer) {
         print("\(map.annotations.count) NUMBERS OF ANNOTATIONS")
@@ -167,7 +250,7 @@ class ViewController: UIViewController {
             removeOverlays()
             map.removeAnnotation(ann)
         }
-        */    
+        */
     }
     
     func removeOverlays() {
@@ -179,15 +262,19 @@ class ViewController: UIViewController {
     func addPolygon() {
         //let coordinates = places.map { $0.coordinate }
         
-        //let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+        //let coordinates = map.annotations.map( { $0.coordinate })
         
+        //let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+       
         var myAnnotations: [CLLocationCoordinate2D] = [CLLocationCoordinate2D]()
+        if map.annotations is MKAnnotation {
+            
+        }
         for (index, anno) in map.annotations.enumerated() {
             if anno.title == "My Location" {
                 continue
             }
             myAnnotations.append(anno.coordinate)
-            print("\(anno.title) <->  \(index)")
         }
         myAnnotations.append(myAnnotations[0])
         let polygon = MKPolygon(coordinates: myAnnotations, count: myAnnotations.count)
@@ -226,6 +313,7 @@ class ViewController: UIViewController {
 
                             if self.numbersOfAnnotations <= 2 {
                                 self.map.addAnnotation(place)
+                                                         
                             }
                             
                             if self.numbersOfAnnotations == 2 {
@@ -249,16 +337,39 @@ func getDistance(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> CL
 }
 
 
-
 extension ViewController: CLLocationManagerDelegate {
+    
+}
+
+extension ViewController: MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if annotation is MKUserLocation {
+            return nil
+        }
+        
+        switch annotation.title {
+            case "distance":
+            let annotationView = map.dequeueReusableAnnotationView(withIdentifier: "customPin") ?? MKMarkerAnnotationView()
+                annotationView.image = UIImage(systemName: "trash")
+              
+                return annotationView
+            default:
+                return nil
+        }
+    }
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
 
+       
         if overlay is MKPolyline {
+            
+            print(overlay.title!!)
             let renderer = MKPolylineRenderer(overlay: overlay)
             renderer.polyline.title = overlay.title ?? ""
+            renderer.polyline.subtitle = overlay.title ?? ""
             renderer.strokeColor = .green
-            renderer.lineWidth = 3
+            renderer.lineWidth = 5
             return renderer
         } else if overlay is MKPolygon {
             let renderer = MKPolygonRenderer(overlay: overlay)
@@ -266,11 +377,10 @@ extension ViewController: CLLocationManagerDelegate {
             renderer.polygon.title = overlay.title ?? ""
             return renderer
             
+        } else if overlay is MKPointAnnotation {
+            
         }
         return MKOverlayRenderer()
     }
-}
-
-extension ViewController: MKMapViewDelegate {
     
 }
