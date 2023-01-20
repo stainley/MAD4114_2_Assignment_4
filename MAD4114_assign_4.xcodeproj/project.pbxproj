@@ -13,7 +13,7 @@
 		AD7B432F2974DBC0008D1164 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AD7B432D2974DBC0008D1164 /* Main.storyboard */; };
 		AD7B43312974DBC0008D1164 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AD7B43302974DBC0008D1164 /* Assets.xcassets */; };
 		AD7B43342974DBC0008D1164 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AD7B43322974DBC0008D1164 /* LaunchScreen.storyboard */; };
-		AD7B433E2974ED17008D1164 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7B433D2974ED17008D1164 /* Place.swift */; };
+		AD7B433E2974ED17008D1164 /* CityAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD7B433D2974ED17008D1164 /* CityAnnotation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +25,7 @@
 		AD7B43302974DBC0008D1164 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AD7B43332974DBC0008D1164 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AD7B43352974DBC0008D1164 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AD7B433D2974ED17008D1164 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
+		AD7B433D2974ED17008D1164 /* CityAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityAnnotation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +65,7 @@
 				AD7B43302974DBC0008D1164 /* Assets.xcassets */,
 				AD7B43322974DBC0008D1164 /* LaunchScreen.storyboard */,
 				AD7B43352974DBC0008D1164 /* Info.plist */,
-				AD7B433D2974ED17008D1164 /* Place.swift */,
+				AD7B433D2974ED17008D1164 /* CityAnnotation.swift */,
 			);
 			path = MAD4114_assign_4;
 			sourceTree = "<group>";
@@ -144,7 +144,7 @@
 				AD7B432C2974DBC0008D1164 /* ViewController.swift in Sources */,
 				AD7B43282974DBC0008D1164 /* AppDelegate.swift in Sources */,
 				AD7B432A2974DBC0008D1164 /* SceneDelegate.swift in Sources */,
-				AD7B433E2974ED17008D1164 /* Place.swift in Sources */,
+				AD7B433E2974ED17008D1164 /* CityAnnotation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
