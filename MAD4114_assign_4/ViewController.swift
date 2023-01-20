@@ -12,20 +12,19 @@ import MapKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var map: MKMapView!
+    @IBOutlet weak var directionButton: UIButton!
     
     var locationManager = CLLocationManager()
     var places: [CityAnnotation] = []
-    //var annotations: [MKAnnotation] = [MKAnnotation]()
     var numberTap: Int = 0
     var numbersOfAnnotations: Int = 0
-   
-    var touchesAnnotation: [CGPoint]?
     var distanceLabels: [UILabel] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        directionButton.isHidden = true
         map.isZoomEnabled = false
         map.showsUserLocation = false
         
@@ -34,25 +33,20 @@ class ViewController: UIViewController {
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
-        //let latitude: CLLocationDegrees = 43.64312520699445
-        //let longitude: CLLocationDegrees = -79.38692805397866
-        
-        let oneTapPress = UITapGestureRecognizer(target: self, action: #selector(addOneTapAnnotation))
+        let oneTapPress = UITapGestureRecognizer(target: self, action: #selector(addAnnotationOnOneTap))
         oneTapPress.delaysTouchesBegan = true
         map.addGestureRecognizer(oneTapPress)
         
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(removeAnnotation))
         longPress.delaysTouchesBegan = true
-        //longPress.numberOfTapsRequired = 2
         map.addGestureRecognizer(longPress)
-        
         map.delegate = self
                         
     }
     
     @IBAction func drawRoute(sender: UIButton) {
         map.removeOverlays(map.overlays)
-        print(map.annotations.count)
+        remoteDistanceLabel()
         
         var nextIndex = 0
         for index in 0...2 {
@@ -77,7 +71,7 @@ class ViewController: UIViewController {
                 guard let directionResponse = response else {
                     return
                 }
-                print("\(directionResponse.routes.count) NUMBERS OF ROUTES")
+                
                 let route = directionResponse.routes[0]
                 self.map.addOverlay(route.polyline, level: .aboveRoads)
                 
@@ -114,89 +108,61 @@ class ViewController: UIViewController {
     
     //MARK: Add Polyne
     func addPolyline() {
-        //self.places.append(places[0])
-        
-        //let locations = places.map { $0.coordinate }
-        //let locations = map.annotations.map( { $0.coordinate; $0.title})
+        directionButton.isHidden = false
         var myAnnotations: [CLLocationCoordinate2D] = [CLLocationCoordinate2D]()
-        for (index, anno) in map.annotations.enumerated() {
-            /*
-            if anno.title == "My Location" {
-                continue
-            }
-            */
-            myAnnotations.append(anno.coordinate)
+        for mapAnnotation in map.annotations {
+    
+            myAnnotations.append(mapAnnotation.coordinate)
         }
+        
         myAnnotations.append(myAnnotations[0])
         
         let polyline = MKPolyline(coordinates: myAnnotations, count: myAnnotations.count)
-        polyline.title = "DONE"
         map.addOverlay(polyline, level: .aboveRoads)
-        
-        
+       
+        showDistanceBetweenTwoPoint()
+    }
+    
+    private func showDistanceBetweenTwoPoint() {
         var nextIndex = 0
-        for index in 0 ... 2{
+        
+        for index in 0...2{
             if index == 2 {
                 nextIndex = 0
             } else {
                 nextIndex = index + 1
             }
-            
-            print("\(map.annotations[index].coordinate) \(map.annotations[nextIndex].coordinate)")
-            
+
             let distance: Double = getDistance(from: map.annotations[index].coordinate, to:  map.annotations[nextIndex].coordinate)
             
             let pointA: CGPoint = map.convert(map.annotations[index].coordinate, toPointTo: map)
             let pointB: CGPoint = map.convert(map.annotations[nextIndex].coordinate, toPointTo: map)
-            print(pointA)
-            print(pointB)
-            let labelDistance = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 25))
+        
+            let labelDistance = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 18))
 
             labelDistance.textAlignment = NSTextAlignment.center
-            labelDistance.text = "\(round(distance * 0.001)) KMs"
+            labelDistance.text = "\(String.init(format: "%2.f",  round(distance * 0.001))) km"
             labelDistance.textColor = .purple
+            labelDistance.backgroundColor = .white
             labelDistance.center = CGPoint(x: (pointA.x + pointB.x) / 2, y: (pointA.y + pointB.y) / 2)
-            //pointA pointB
-            labelDistance.tag = 101
             
             distanceLabels.append(labelDistance)
-            distanceMarket(distance: distance, polyline: polyline)
-            
         }
         for label in distanceLabels {
             map.addSubview(label)
-
         }
     }
     
-    private func distanceMarket(distance: Double, polyline: MKPolyline) {
-        
-        let pin = MKPointAnnotation()
-        pin.title = "distance"
-
-        let point: CGPoint = map.convert(polyline.coordinate, toPointTo: map)
-        
-        pin.coordinate = map.convert(point, toCoordinateFrom: map)
-        
-
-        print(point)
-        print("\(round(distance)) ms")
-       
-    }
-    
-    
+    // MARK: Remove Annotation by City name
     @objc func removeAnnotation(point: UITapGestureRecognizer) {
-        print("\(map.annotations.count) NUMBERS OF ANNOTATIONS")
-
+      
         let pointTouched: CGPoint = point.location(in: map)
         
-        let coord =  map.convert(pointTouched, toCoordinateFrom: map)
-        let loc: CLLocationCoordinate2D = coord
-        
-        //let myAnnotationTitle = map.annotations.map({$0.title})
+        let coordinate =  map.convert(pointTouched, toCoordinateFrom: map)
+        let location: CLLocationCoordinate2D = coordinate
           
         // from coordinate get city name
-        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: loc.latitude, longitude: loc.longitude), completionHandler: { (placemarks, error) in
+        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: location.latitude, longitude: location.longitude), completionHandler: { (placemarks, error) in
             if error != nil {
                 print(error!)
             } else {
@@ -213,8 +179,6 @@ class ViewController: UIViewController {
                                 }
                             }
                         }
-                        print("\(self.map.annotations.count) NUMBERS OF ANNOTATIONS")
-
                     }
                 }
             }
@@ -222,31 +186,33 @@ class ViewController: UIViewController {
     }
     
     func removeOverlays() {
-       
-        for label in distanceLabels {
-            label.removeFromSuperview()
-        }
-        
-        distanceLabels = []
+        directionButton.isHidden = true
+        remoteDistanceLabel()
         
         for polygon in map.overlays {
             map.removeOverlay(polygon)
         }
     }
     
+    private func remoteDistanceLabel() {
+        for label in distanceLabels {
+            label.removeFromSuperview()
+        }
+        
+        distanceLabels = []
+    }
+    
     func addPolygon() {
 
         var myAnnotations: [CLLocationCoordinate2D] = [CLLocationCoordinate2D]()
-        if map.annotations is MKAnnotation {
-            
-        }
+   
         for anno in map.annotations{
             if anno.title == "My Location" {
                 continue
             }
             myAnnotations.append(anno.coordinate)
         }
-        myAnnotations.append(myAnnotations[0])
+
         let polygon = MKPolygon(coordinates: myAnnotations, count: myAnnotations.count)
         
         map.addOverlay(polygon)
@@ -259,7 +225,7 @@ class ViewController: UIViewController {
     }
     
     //MARK: Add MKPoint Annotation to the map
-    @objc func addOneTapAnnotation(gestureRecognizer: UIGestureRecognizer) {
+    @objc func addAnnotationOnOneTap(gestureRecognizer: UIGestureRecognizer) {
         
         numbersOfAnnotations = map.annotations.count
         
@@ -276,7 +242,8 @@ class ViewController: UIViewController {
                         
                         if placeMark.locality != nil {
                             let place = CityAnnotation(title: placeMark.locality!, coordinate: coordinate)
-
+                            
+                            // Add up to 3 Annotations on the map
                             if self.numbersOfAnnotations <= 2 {
                                 self.map.addAnnotation(place)
                             }
@@ -308,27 +275,10 @@ extension ViewController: CLLocationManagerDelegate {
 
 extension ViewController: MKMapViewDelegate {
     
-    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        if annotation is MKUserLocation {
-            return nil
-        }
-        
-        switch annotation.title {
-            case "distance":
-            let annotationView = map.dequeueReusableAnnotationView(withIdentifier: "customPin") ?? MKMarkerAnnotationView()
-                annotationView.image = UIImage(systemName: "trash")
-              
-                return annotationView
-            default:
-                return nil
-        }
-    }
-    
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
        
         if overlay is MKPolyline {
             
-            print(overlay.title!!)
             let renderer = MKPolylineRenderer(overlay: overlay)
             renderer.strokeColor = .green
             renderer.lineWidth = 5
