@@ -60,14 +60,12 @@
 			children = (
 				AD7B43272974DBC0008D1164 /* AppDelegate.swift */,
 				AD7B43292974DBC0008D1164 /* SceneDelegate.swift */,
-				AD7B432B2974DBC0008D1164 /* ViewController.swift */,
 				ADF40037297A56A000113B6E /* Model */,
 				ADF40035297A568300113B6E /* View */,
 				ADF40036297A569200113B6E /* Controller */,
 				AD7B43302974DBC0008D1164 /* Assets.xcassets */,
 				AD7B43322974DBC0008D1164 /* LaunchScreen.storyboard */,
 				AD7B43352974DBC0008D1164 /* Info.plist */,
-				AD7B433D2974ED17008D1164 /* CityAnnotation.swift */,
 			);
 			path = MAD4114_assign_4;
 			sourceTree = "<group>";
@@ -83,6 +81,7 @@
 		ADF40036297A569200113B6E /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				AD7B432B2974DBC0008D1164 /* ViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -90,6 +89,7 @@
 		ADF40037297A56A000113B6E /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				AD7B433D2974ED17008D1164 /* CityAnnotation.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
